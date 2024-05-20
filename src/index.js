@@ -1,12 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
+import StartRating from './StartRating';
+// import './index.css';
+// import App from './App';
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    {/* <App /> */}
+    <StartRating defaultRating={4} maxRating={5} messages={['Terrible', 'Bad', 'Okey', 'Good', 'Amazing']} />
   </React.StrictMode>
 );
 
