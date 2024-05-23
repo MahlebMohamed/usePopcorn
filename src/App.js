@@ -58,16 +58,29 @@ export default function App() {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState(tempWatchedData);
   const [isLoading, setIsLoading] = useState(false);
-  const query = 'interstellar';
+  const [error, setError] = useState('');
+  const query = 'interstellardz';
 
   useEffect(function () {
     async function fetchMovies() {
-      setIsLoading(true);
-      const response = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`);
-      const data = await response.json();
+      try {
+        setIsLoading(true);
+        const response = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`);
 
-      setMovies(data.Search);
-      setIsLoading(false);
+        if (!response.ok)
+          throw new Error('Something went wrong with fetching movies');
+
+        const data = await response.json();
+
+        if (data.Response === 'False')
+          throw new Error('Movies not found');
+
+        setMovies(data.Search);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     fetchMovies();
@@ -83,7 +96,11 @@ export default function App() {
 
       <Main>
         <Box>
-          {isLoading ? <Loader /> : <MovieList movies={movies} />}
+          {/* {isLoading ? <Loader /> : <MovieList movies={movies} />} */}
+
+          {isLoading && <Loader />}
+          {!isLoading && !error && <MovieList movies={movies} />}
+          {error && <MessageError message={error} />}
         </Box>
 
         <Box>
@@ -98,6 +115,12 @@ export default function App() {
 function Loader() {
   return <p className="loader">
     Loading...
+  </p>
+}
+
+function MessageError({ message }) {
+  return <p className="error">
+    <span>❌</span> {message}
   </p>
 }
 
